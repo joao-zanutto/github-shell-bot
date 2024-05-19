@@ -1,0 +1,68 @@
+import YAML from "yaml";
+import pkg from "template-file";
+const { renderFile } = pkg;
+
+export default class Bot {
+  constructor(octokit, payload) {
+    if (!payload.issue.pull_request) {
+      return undefined;
+    }
+    this.payload = payload;
+    this.octokit = octokit;
+  }
+
+  async fetchRepoScripts() {
+    const scriptsPath = process.env.REPO_SCRIPTS_FILE_PATH ?? "command.yaml";
+
+    const req = await this.octokit.rest.repos.getContent({
+      owner: this.payload.repository.owner.login,
+      repo: this.payload.repository.name,
+      path: scriptsPath,
+    });
+
+    this.scripts = YAML.parse(
+      Buffer.from(req.data.content, "base64").toString()
+    );
+
+    return this.scripts;
+  }
+
+  getCommand() {
+    const initiatorString = process.env.INITIATOR_STRING ?? "shell run";
+    this.command = this.payload.comment.body.split(initiatorString + " ")[1];
+    if (!this.command) {
+      return undefined;
+    }
+    return this.command;
+  }
+
+  async acknowledgeCommand() {
+    await this.octokit.rest.reactions.createForIssueComment({
+      owner: this.payload.repository.owner.login,
+      repo: this.payload.repository.name,
+      comment_id: this.payload.comment.id,
+      content: "+1",
+    });
+  }
+
+  async denyCommand() {
+    await this.octokit.rest.reactions.createForIssueComment({
+      owner: this.payload.repository.owner.login,
+      repo: this.payload.repository.name,
+      comment_id: this.payload.comment.id,
+      content: "-1",
+    });
+  }
+
+  async reportResults(result) {
+    await this.octokit.rest.issues.createComment({
+      owner: this.payload.repository.owner.login,
+      repo: this.payload.repository.name,
+      issue_number: this.payload.issue.number,
+      body: await renderFile("./static/report.md", {
+        command: this.command,
+        result: result,
+      }),
+    });
+  }
+}
