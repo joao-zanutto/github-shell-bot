@@ -11,20 +11,42 @@ export default class Bot {
     this.octokit = octokit;
   }
 
-  async fetchRepoScripts() {
-    const scriptsPath = process.env.REPO_SCRIPTS_FILE_PATH ?? "command.yaml";
-
-    const req = await this.octokit.rest.repos.getContent({
+  async comment(body) {
+    await this.octokit.rest.issues.createComment({
       owner: this.payload.repository.owner.login,
       repo: this.payload.repository.name,
-      path: scriptsPath,
+      issue_number: this.payload.issue.number,
+      body: body,
     });
+  }
 
-    this.scripts = YAML.parse(
-      Buffer.from(req.data.content, "base64").toString()
-    );
+  async react(content) {
+    await this.octokit.rest.reactions.createForIssueComment({
+      owner: this.payload.repository.owner.login,
+      repo: this.payload.repository.name,
+      comment_id: this.payload.comment.id,
+      content: content,
+    });
+  }
 
-    return this.scripts;
+  async fetchRepoScripts() {
+    this.scriptsPath = process.env.REPO_SCRIPTS_FILE_PATH ?? "command.yaml";
+
+    console.log(this.scriptPath);
+    try {
+      this.scriptFile = await this.octokit.rest.repos.getContent({
+        owner: this.payload.repository.owner.login,
+        repo: this.payload.repository.name,
+        path: this.scriptsPath,
+      });
+      this.scripts = YAML.parse(
+        Buffer.from(this.scriptFile.data.content, "base64").toString()
+      );
+
+      return this.scripts;
+    } catch {
+      return;
+    }
   }
 
   getCommand() {
@@ -36,33 +58,20 @@ export default class Bot {
     return this.command;
   }
 
-  async acknowledgeCommand() {
-    await this.octokit.rest.reactions.createForIssueComment({
-      owner: this.payload.repository.owner.login,
-      repo: this.payload.repository.name,
-      comment_id: this.payload.comment.id,
-      content: "+1",
-    });
-  }
-
-  async denyCommand() {
-    await this.octokit.rest.reactions.createForIssueComment({
-      owner: this.payload.repository.owner.login,
-      repo: this.payload.repository.name,
-      comment_id: this.payload.comment.id,
-      content: "-1",
-    });
+  async reportNotFound() {
+    await this.comment(
+      await renderFile("./static/file-not-found.md", {
+        scriptsPath: this.scriptsPath,
+      })
+    );
   }
 
   async reportResults(result) {
-    await this.octokit.rest.issues.createComment({
-      owner: this.payload.repository.owner.login,
-      repo: this.payload.repository.name,
-      issue_number: this.payload.issue.number,
-      body: await renderFile("./static/report.md", {
+    await this.comment(
+      await renderFile("./static/report.md", {
         command: this.command,
         result: result,
-      }),
-    });
+      })
+    );
   }
 }

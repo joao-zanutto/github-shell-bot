@@ -10,18 +10,22 @@ export default async ({ octokit, payload }) => {
 
   const scripts = await bot.fetchRepoScripts();
   const command = bot.getCommand();
-  // validate initializer string is used
+  console.log(scripts);
   if (!command) {
+    return;
+  }
+  if (!scripts) {
+    await bot.reportNotFound();
     return;
   }
 
   const executor = new Executor(scripts, command);
   // validate command exists
   if (JSON.stringify(executor) == "{}") {
-    await bot.denyCommand();
+    await bot.react("-1");
     return;
   }
-  await bot.acknowledgeCommand();
+  await bot.react("+1");
 
   const result = executor.execute();
   await bot.reportResults(result);
