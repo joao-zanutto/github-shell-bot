@@ -39,11 +39,15 @@ script:
 
 Running the command bellow will start a server in http://localhost:3000
 
-``npm i && npm run server`
+```bash
+npm i && npm run server
+```
 
 Or using docker
 
-`docker run -p 3000:3000 ghcr.io/joao-zanutto/github-shell-bot`
+```bash
+docker run -p 3000:3000 ghcr.io/joao-zanutto/github-shell-bot
+```
 
 ## Execution
 
