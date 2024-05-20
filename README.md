@@ -27,6 +27,14 @@ The server needs to be configured via rnvironment variables. Check `.env.sample`
 
 ## Declaring commands
 
+Here is an example of the `command.yaml` file:
+
+```yaml
+script:
+  - echo "do something"
+  - aws s3 ls
+```
+
 ## Deploying
 
 Running the command bellow will start a server in http://localhost:3000
