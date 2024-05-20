@@ -19,7 +19,7 @@ This GitHub App was created to facilitate and improve the experience of running 
 4. Add a `command.yaml` with the scripts you want to run in the repository you will run commands
 5. Comment on a PR
 
-![Alt text](image.png)
+![Alt text](image-1.png)
 
 ## Configuring the server
 
