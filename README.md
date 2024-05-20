@@ -1,4 +1,4 @@
-# Github Shell Butler - GitHub App
+# Github Shell Bot - GitHub App
 
 A GitHub bot that runs shell scripts from PR comments.
 
@@ -35,7 +35,7 @@ Running the command bellow will start a server in http://localhost:3000
 
 Or using docker
 
-`docker run -p 3000:3000 ghcr.io/joao-zanutto/github-shell-butler`
+`docker run -p 3000:3000 ghcr.io/joao-zanutto/github-shell-bot`
 
 ## Execution
 
