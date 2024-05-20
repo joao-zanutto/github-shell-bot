@@ -10,7 +10,6 @@ export default async ({ octokit, payload }) => {
 
   const scripts = await bot.fetchRepoScripts();
   const command = bot.getCommand();
-  console.log(scripts);
   if (!command) {
     return;
   }

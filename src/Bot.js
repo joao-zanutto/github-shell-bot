@@ -31,8 +31,6 @@ export default class Bot {
 
   async fetchRepoScripts() {
     this.scriptsPath = process.env.REPO_SCRIPTS_FILE_PATH ?? "command.yaml";
-
-    console.log(this.scriptPath);
     try {
       this.scriptFile = await this.octokit.rest.repos.getContent({
         owner: this.payload.repository.owner.login,
