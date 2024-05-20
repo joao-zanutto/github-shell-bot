@@ -42,7 +42,7 @@ const localWebhookUrl = `http://localhost:${port}${path}`;
 // See https://github.com/octokit/webhooks.js/#createnodemiddleware for all options
 const middleware = createNodeMiddleware(app.webhooks, { path });
 
-http.createServer(middleware).listen(port, () => {
+http.createServer(middleware).listen(port, process.env.HOST, () => {
   console.log(`Server is listening for events at: ${localWebhookUrl}`);
   console.log("Press Ctrl + C to quit.");
 });
