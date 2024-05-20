@@ -36,4 +36,4 @@
 
 {{/result}}
 
-Shell Butler script report
+Shell Bot script report
