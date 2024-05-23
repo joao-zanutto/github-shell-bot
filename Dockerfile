@@ -1,4 +1,4 @@
-FROM node:alpine
+FROM node:alpine3.19
 
 RUN apk update && apk add aws-cli
 
